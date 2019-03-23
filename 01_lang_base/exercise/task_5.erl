@@ -7,7 +7,7 @@
 
 %% get 3 float numbers from binary
 get_floats(Bin) ->
-    {0.0, 0.0, 0.0}.
+    list_to_tuple([X || <<X:64/float>> <= Bin]).
 
 get_floats_test() ->
     ?assertEqual({1.0, 2.5, 100.500},
