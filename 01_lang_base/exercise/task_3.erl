@@ -8,7 +8,9 @@
 %% Calculate distance between 2 points on 2D surface
 %% points are given as tuple {X, Y}, distance should be float
 distance({X1, Y1}, {X2, Y2}) ->
-    math:sqrt((X2-X1)*(X2-X1) + (Y2-Y1)*(Y2-Y1)).
+    V1 = X2 - X1,
+    V2 = Y2 - Y1,
+    math:sqrt(V1*V1 + V2*V2).
 
 distance_test() ->
     ?assertEqual(5.0, distance({0, 0}, {0, 5})),
