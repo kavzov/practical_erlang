@@ -7,8 +7,14 @@
 
 %% implement lists:member/2
 %% http://www.erlang.org/doc/man/lists.html#member-2
-member(Elem, List) ->
-    false.
+% member(Elem, List) ->
+%     false.
+member(_, []) -> false;
+member(Elem, [Val | Rest]) -> 
+    if
+        Elem == Val -> true;
+        true -> member(Elem, Rest)
+    end.
 
 
 member_test() ->
@@ -22,8 +28,16 @@ member_test() ->
 
 %% implement lists:filter/2
 %% http://www.erlang.org/doc/man/lists.html#filter-2
-filter(Pred, List) ->
-    List.
+% filter(Pred, List) ->
+%     List.
+filter(Pred, List) -> filter(Pred, List, []).
+filter(_, [], Acc) -> lists:reverse(Acc);
+filter(Pred, [Elem | Rest], Acc) -> 
+    Elem_in_list = Pred(Elem),
+    if
+        Elem_in_list -> filter(Pred, Rest, [Elem | Acc]);
+        true -> filter(Pred, Rest, Acc)
+    end.
 
 
 filter_test() ->
