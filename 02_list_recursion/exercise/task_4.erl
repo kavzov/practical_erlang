@@ -10,14 +10,14 @@
 % dropwhile(Pred, List) ->
 %     List.
 dropwhile(Pred, List) -> dropwhile(Pred, List, [], false).
-dropwhile(_Pred, [], Acc, _Flag) -> lists:reverse(Acc);
-dropwhile(Pred, [Elem | Rest], Acc, Flag) -> 
+dropwhile(_Pred, [], Acc, _End_proper_flag) -> lists:reverse(Acc);
+dropwhile(Pred, [Elem | Rest], Acc, End_proper_flag) -> 
     Proper_elem = Pred(Elem),
     if
         Proper_elem -> dropwhile(Pred, Rest, Acc, true);
         true ->
             if
-                Flag -> [Elem | Rest];
+                End_proper_flag -> [Elem | Rest];
                 true -> dropwhile(Pred, Rest, [Elem | Acc], false)
             end
     end.
@@ -40,19 +40,19 @@ dropwhile_test() ->
 %     List.
 takewhile(Pred, List) -> takewhile(Pred, List, [], [], false).
 
-takewhile(_Pred, [], Acc, TmpAcc, _Flag) -> 
+takewhile(_Pred, [], Acc, TmpAcc, _End_proper_flag) -> 
     if
         length(TmpAcc) > length(Acc) -> lists:reverse(TmpAcc);
         true -> lists:reverse(Acc)
     end;
 
-takewhile(Pred, [Elem | Rest], Acc, TmpAcc, Flag) -> 
+takewhile(Pred, [Elem | Rest], Acc, TmpAcc, End_proper_flag) -> 
     Proper_elem = Pred(Elem),
     if
         Proper_elem -> takewhile(Pred, Rest, Acc, [Elem | TmpAcc], true);
         true -> 
             if
-                Flag -> 
+                End_proper_flag -> 
                     if 
                         length(TmpAcc) > length(Acc) -> takewhile(Pred, Rest, TmpAcc, [], false);
                         true -> takewhile(Pred, Rest, Acc, [], false)
