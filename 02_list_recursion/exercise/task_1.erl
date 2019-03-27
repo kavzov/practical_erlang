@@ -6,8 +6,15 @@
 
 %% implement lists:any/2
 %% http://www.erlang.org/doc/man/lists.html#any-2
-any(Pred, List) ->
-    false.
+% any(Pred, List) ->
+%     false.
+any(_, []) -> false;
+any(Pred, [Elem | Rest]) ->
+    Elem_in_list = Pred(Elem),
+    if
+        Elem_in_list -> true;
+        true -> any(Pred, Rest)
+    end.    
 
 
 any_test() ->
@@ -23,8 +30,15 @@ any_test() ->
 
 %% implement lists:all/2
 %% http://www.erlang.org/doc/man/lists.html#all-2
-all(Pred, List) ->
-    false.
+% all(Pred, List) ->
+%     false.
+all(_, []) -> true;
+all(Pred, [Elem | Rest]) ->
+    Elem_in_list = Pred(Elem),
+    if
+        Elem_in_list -> all(Pred, Rest);
+        true -> false
+    end.
 
 
 all_test() ->
