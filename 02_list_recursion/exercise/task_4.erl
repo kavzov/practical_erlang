@@ -7,8 +7,20 @@
 
 %% implement lists:dropwhile/2
 %% http://www.erlang.org/doc/man/lists.html#dropwhile-2
-dropwhile(Pred, List) ->
-    List.
+% dropwhile(Pred, List) ->
+%     List.
+dropwhile(Pred, List) -> dropwhile(Pred, List, [], false).
+dropwhile(_Pred, [], Acc, _Flag) -> lists:reverse(Acc);
+dropwhile(Pred, [Elem | Rest], Acc, Flag) -> 
+    Proper_elem = Pred(Elem),
+    if
+        Proper_elem -> dropwhile(Pred, Rest, Acc, true);
+        true ->
+            if
+                Flag -> [Elem | Rest];
+                true -> dropwhile(Pred, Rest, [Elem | Acc], false)
+            end
+    end.
 
 
 dropwhile_test() ->
@@ -24,8 +36,31 @@ dropwhile_test() ->
 
 %% implement lists:takewhile/2
 %% http://www.erlang.org/doc/man/lists.html#takewhile-2
-takewhile(Pred, List) ->
-    List.
+% takewhile(Pred, List) ->
+%     List.
+takewhile(Pred, List) -> takewhile(Pred, List, [], [], false).
+
+takewhile(_Pred, [], Acc, TmpAcc, _Flag) -> 
+    if
+        length(TmpAcc) > length(Acc) -> lists:reverse(TmpAcc);
+        true -> lists:reverse(Acc)
+    end;
+
+takewhile(Pred, [Elem | Rest], Acc, TmpAcc, Flag) -> 
+    Proper_elem = Pred(Elem),
+    if
+        Proper_elem -> takewhile(Pred, Rest, Acc, [Elem | TmpAcc], true);
+        true -> 
+            if
+                Flag -> 
+                    if 
+                        length(TmpAcc) > length(Acc) -> takewhile(Pred, Rest, TmpAcc, [], false);
+                        true -> takewhile(Pred, Rest, Acc, [], false)
+                    end;
+                true ->
+                    takewhile(Pred, Rest, Acc, [], false)
+            end
+    end.
 
 
 takewhile_test() ->
