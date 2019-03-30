@@ -60,15 +60,8 @@ sample_champ() ->
 
 
 get_stat(Champ) ->
-    TeamStatFn = fun({player, _, Age, Rating, _}, {stat, NumTeamPlayers, TeamTotalAge, TeamTotalRating}) ->
-        {stat, NumTeamPlayers + 1, TeamTotalAge + Age, TeamTotalRating + Rating}
-    end,
-    % StatByTeams = lists:map(fun({team, Name, Players}) -> {team, Name, lists:foldl(TeamStatFn, {stat, 0, 0, 0}, Players)} end, Champ),
-    StatByTeams = [{team, Name, lists:foldl(TeamStatFn, {stat, 0, 0, 0}, Players)} || {team, Name, Players} <- Champ],
-    TeamsStatFn = fun({team, _Name, {stat, NumTeamPlayers, TeamTotalAge, TeamTotalRating}}, {NumTeams, NumPlayers, TotalAge, TotalRating}) ->
-        {NumTeams + 1, NumPlayers + NumTeamPlayers, TotalAge + TeamTotalAge, TotalRating + TeamTotalRating}
-    end,
-    {NumTeams, NumPlayers, TotalAge, TotalRating} = lists:foldl(TeamsStatFn, {0, 0, 0, 0}, StatByTeams),
+    {NumTeams, AllPlayers} = lists:foldl(fun({team, _, TeamPlayers}, {NumTeams, TotalPlayers}) -> {NumTeams + 1, TotalPlayers ++ TeamPlayers} end, {0, []}, Champ),
+    {NumPlayers, TotalAge, TotalRating} = lists:foldl(fun({player, _, Age, Rating, _}, {NumPlayers, TotalAge, TotalRating}) -> {NumPlayers + 1, TotalAge + Age, TotalRating + Rating} end, {0, 0, 0}, AllPlayers),
     {NumTeams, NumPlayers, TotalAge/NumPlayers, TotalRating/NumPlayers}.
 
 
