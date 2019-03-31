@@ -60,8 +60,11 @@ sample_champ() ->
 
 
 get_stat(Champ) ->
+    %% Number of championship teams and a list containing all teams players
     {NumTeams, AllPlayers} = lists:foldl(fun({team, _, TeamPlayers}, {NumTeams, TotalPlayers}) -> {NumTeams + 1, TotalPlayers ++ TeamPlayers} end, {0, []}, Champ),
+    %% Number of players, total age and total rating of all players
     {NumPlayers, TotalAge, TotalRating} = lists:foldl(fun({player, _, Age, Rating, _}, {NumPlayers, TotalAge, TotalRating}) -> {NumPlayers + 1, TotalAge + Age, TotalRating + Rating} end, {0, 0, 0}, AllPlayers),
+    %% Final stat containing average age and average rating of the players
     {NumTeams, NumPlayers, TotalAge/NumPlayers, TotalRating/NumPlayers}.
 
 
@@ -71,11 +74,12 @@ get_stat_test() ->
 
 
 filter_sick_players(Champ) ->
+    %% Function for filter sick players in a team
     HealthyPlayersFn = fun({player, _, _, _, Health}) -> Health >= 50 end,
-    HealthyTeamFn = fun({team, _, Players}) -> length(Players) > 5 end,
-
-    HChamp = lists:map(fun({team, Name, Players}) -> {team, Name, lists:filter(HealthyPlayersFn, Players)} end, Champ),
-    lists:filter(HealthyTeamFn, HChamp).
+    %% Teams containing only healthy players
+    HealthyTeams = lists:map(fun({team, Name, Players}) -> {team, Name, lists:filter(HealthyPlayersFn, Players)} end, Champ),
+    %% Fiter teams with less than 5 players
+    lists:filter(fun({team, _, Players}) -> length(Players) > 5 end, HealthyTeams).
 
 
 filter_sick_players_test() ->
