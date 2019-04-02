@@ -96,12 +96,12 @@ group_by_gender_test() ->
 						{user,"Kate",18,female},
 						{user,"Laura",55,female},
 						{user,"Molly",12,female}
-		       		],
+					],
 			male => [
 						{user,"Bill",34,male},
 						{user,"Bob",29,male},
 						{user,"Dan",15,male},
-		       	{user,"Patrick",65,male}
+						{user,"Patrick",65,male}
 					]
 		},
 	?assertEqual(Results, group_by_gender(init())),
