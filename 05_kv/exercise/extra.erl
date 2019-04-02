@@ -22,7 +22,7 @@ group_by(GroupFn, Users) ->
 	GroupCategories = proplists:get_keys(UsersPL),
 	lists:foldl(
 		fun(GC, M) ->
-			maps:put(GC, proplists:get_all_values(GC, UsersPL), M)
+			maps:put(GC, lists:sort(proplists:get_all_values(GC, UsersPL)), M)
 		end,
 		#{},
 		GroupCategories
@@ -40,7 +40,7 @@ group_by_gender(Users) ->
 		{[], []},
 		Users
 	),
-	#{male => Males, female => Females}.
+	#{male => lists:sort(Males), female => lists:sort(Females)}.
 
 
 %% Tests
@@ -63,40 +63,48 @@ group_gender_fn() ->
 
 group_by_test() ->
 	AgeGroupResults =
-	   #{
-			child => [{user,"Molly",12,female},{user,"Dan",15,male}],
-  			young => [{user,"Helen",21,female},{user,"Kate",18,female}],
-  			middle => [{user,"Bob",29,male},{user,"Bill",34,male}],
-  			old => [{user,"Patrick",65,male},{user,"Laura",55,female}]
-  		},
-  	GenderGroupResults =
-  	   #{
-		  	female => [{user,"Molly",12,female},
-		       		   {user,"Helen",21,female},
-		       		   {user,"Laura",55,female},
-		       		   {user,"Kate",18,female}],
-		  	male => [{user,"Bob",29,male},
-		       		 {user,"Bill",34,male},
-		       		 {user,"Patrick",65,male},
-		       		 {user,"Dan",15,male}]
-	    },
-  	?assertEqual(AgeGroupResults, group_by(group_age_fn(), init())),
-  	?assertEqual(GenderGroupResults, group_by(group_gender_fn(), init())),
-  	ok.
+		#{
+			child => [{user,"Dan",15,male}, {user,"Molly",12,female}],
+ 			young => [{user,"Helen",21,female}, {user,"Kate",18,female}],
+			middle => [{user,"Bill",34,male}, {user,"Bob",29,male}],
+			old => [{user,"Laura",55,female}, {user,"Patrick",65,male}]
+		},
+	GenderGroupResults =
+		#{
+			female => [
+						{user,"Helen",21,female},
+						{user,"Kate",18,female},
+						{user,"Laura",55,female},
+						{user,"Molly",12,female}
+		       		],
+			male => [
+						{user,"Bill",34,male},
+						{user,"Bob",29,male},
+						{user,"Dan",15,male},
+		       			{user,"Patrick",65,male}
+					]
+		},
+	?assertEqual(AgeGroupResults, group_by(group_age_fn(), init())),
+	?assertEqual(GenderGroupResults, group_by(group_gender_fn(), init())),
+	ok.
 
 group_by_gender_test() ->
 	Results =
-	  #{
-		female =>
-	      [{user,"Kate",18,female},
-	       {user,"Laura",55,female},
-	       {user,"Helen",21,female},
-	       {user,"Molly",12,female}],
-	    male =>
-	      [{user,"Dan",15,male},
-	       {user,"Patrick",65,male},
-	       {user,"Bill",34,male},
-	       {user,"Bob",29,male}]
-	    },
-    ?assertEqual(Results, group_by_gender(init())),
-    ok.
+		#{
+			female => [
+						{user,"Helen",21,female},
+						{user,"Kate",18,female},
+						{user,"Laura",55,female},
+						{user,"Molly",12,female}
+		       		],
+			male => [
+						{user,"Bill",34,male},
+						{user,"Bob",29,male},
+						{user,"Dan",15,male},
+		       			{user,"Patrick",65,male}
+					]
+		},
+	?assertEqual(Results, group_by_gender(init())),
+	ok.
+
+
