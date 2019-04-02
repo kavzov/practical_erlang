@@ -17,25 +17,8 @@ init() ->
 	].
 
 
-group_age_fn() ->
-	fun({user, _, Age, _}) ->
-		if
-			Age =< 15 -> child;
-			(Age > 15) and (Age =< 25) -> young;
-			(Age > 25) and (Age =< 50) -> middle;
-			Age > 50 -> old
-		end
-	end.
-
-
-group_gender_fn() ->
-	fun({user, _, _, Gender}) ->
-		Gender
-	end.
-
-
-group_by(GetGroupCategory, Users) ->
-	UsersPL = [{GetGroupCategory(User), User} || User <- Users],
+group_by(GroupFn, Users) ->
+	UsersPL = [{GroupFn(User), User} || User <- Users],
 	GroupCategories = proplists:get_keys(UsersPL),
 	lists:foldl(
 		fun(GC, M) ->
@@ -61,6 +44,22 @@ group_by_gender(Users) ->
 
 
 %% Tests
+
+group_age_fn() ->
+	fun({user, _, Age, _}) ->
+		if
+			Age =< 15 -> child;
+			(Age > 15) and (Age =< 25) -> young;
+			(Age > 25) and (Age =< 50) -> middle;
+			Age > 50 -> old
+		end
+	end.
+
+group_gender_fn() ->
+	fun({user, _, _, Gender}) ->
+		Gender
+	end.
+
 
 group_by_test() ->
 	AgeGroupResults =
