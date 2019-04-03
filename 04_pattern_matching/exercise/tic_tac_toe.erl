@@ -33,7 +33,7 @@ get_coords(Cell, Dim) ->
 
 
 move(Cell, Player, GameState) ->
-	Dim = 3,
+  Dim = 3,
   if
     Cell > Dim*Dim -> {error, invalid_move};
     (Player /= x) and (Player /= o) -> {error, invalid_player};
