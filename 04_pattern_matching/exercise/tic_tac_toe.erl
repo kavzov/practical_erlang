@@ -4,32 +4,32 @@
 
 
 new_game() ->
-    {{f, f, f},
-     {f, f, f},
-     {f, f, f}}.
+  {{f, f, f},
+  {f, f, f},
+  {f, f, f}}.
 
 
 win(GameState) ->
-    case GameState of
-      {{U, U, U}, {_, _, _}, {_, _, _}} when U /= f -> {win, U};
-      {{_, _, _}, {U, U, U}, {_, _, _}} when U /= f -> {win, U};
-      {{_, _, _}, {_, _, _}, {U, U, U}} when U /= f -> {win, U};
-      {{_, _, U}, {_, _, U}, {_, _, U}} when U /= f -> {win, U};
-      {{_, U, _}, {_, U, _}, {_, U, _}} when U /= f -> {win, U};
-      {{U, _, _}, {U, _, _}, {U, _, _}} when U /= f -> {win, U};
-      {{U, _, _}, {_, U, _}, {_, _, U}} when U /= f -> {win, U};
-      {{_, _, U}, {_, U, _}, {U, _, _}} when U /= f -> {win, U};
-      _ -> no_win
-    end.
+  case GameState of
+    {{U, U, U}, {_, _, _}, {_, _, _}} when U /= f -> {win, U};
+    {{_, _, _}, {U, U, U}, {_, _, _}} when U /= f -> {win, U};
+    {{_, _, _}, {_, _, _}, {U, U, U}} when U /= f -> {win, U};
+    {{_, _, U}, {_, _, U}, {_, _, U}} when U /= f -> {win, U};
+    {{_, U, _}, {_, U, _}, {_, U, _}} when U /= f -> {win, U};
+    {{U, _, _}, {U, _, _}, {U, _, _}} when U /= f -> {win, U};
+    {{U, _, _}, {_, U, _}, {_, _, U}} when U /= f -> {win, U};
+    {{_, _, U}, {_, U, _}, {U, _, _}} when U /= f -> {win, U};
+    _ -> no_win
+  end.
 
 
 get_coords(Cell, Dim) ->
-	Row = Cell div Dim,
-	Column = Cell rem Dim,
-	if
-		Column == 0 -> {Row, Dim};
-		true -> {Row+1, Column}
-	end.
+  Row = Cell div Dim,
+  Column = Cell rem Dim,
+  if
+    Column == 0 -> {Row, Dim};
+    true -> {Row+1, Column}
+  end.
 
 
 move(Cell, Player, GameState) ->
