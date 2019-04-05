@@ -52,7 +52,7 @@ get_idea(Id) ->
 
 
 ideas_by_author(Author) ->
-    lists:sort(ets:match_object(great_ideas_table, {idea, '_', '_', Author, '_', '_'})).
+    lists:sort(ets:match_object(great_ideas_table, ?AuthorPtn)).
 
 
 ideas_by_rating(Rating) ->
@@ -65,20 +65,19 @@ ideas_by_rating(Rating) ->
 
 
 get_authors() ->
-    MS = ets:fun2ms(fun(?AuthorPtn) -> Author end),
     % List of authors without repeats
+    MS = ets:fun2ms(fun(?AuthorPtn) -> Author end),
     Authors = lists:usort(ets:select(great_ideas_table, MS)),
     % List containing tuples like {Author, NumOfIdeas}
     AuthorsWithNumOfIdeas = lists:map(
         fun(Author) -> {Author, length(ets:match(great_ideas_table, ?AuthorPtn))} end,
         Authors
     ),
-    SortFn = 
-        fun({Author1, Count1},{Author2, Count2}) -> 
-            if Count1 == Count2 -> Author2 > Author1;
-            true -> Count1 > Count2
-            end
-        end,
-    % Sorts the previous list by number of ideas and authors names
+    % The list sorted by number of ideas and authors names
+    SortFn = fun({Author1, Count1},{Author2, Count2}) -> 
+                if Count1 == Count2 -> Author2 > Author1;
+                true -> Count1 > Count2
+                end
+            end,
     lists:sort(SortFn, AuthorsWithNumOfIdeas).
 
