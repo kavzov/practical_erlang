@@ -5,10 +5,11 @@
 -export([init/0,
          add_idea/5, get_idea/1,
          ideas_by_author/1, ideas_by_rating/1,
-         get_authors/0,
-         elem_cnt/2]).
+         get_authors/0]).
 
 -record(idea, {id, title, author, rating, description}).
+
+-define(AuthorPtn, {idea, '_', '_', Author, '_', '_'}).
 
 
 init() ->
@@ -63,28 +64,21 @@ ideas_by_rating(Rating) ->
     ets:select(great_ideas_table, MS).
 
 
-elem_cnt(Elem, List) ->
-    Cnt = lists:foldl(
-        fun(Item, Cnt) ->
-            if Item == Elem -> Cnt+1;
-            true -> Cnt
-            end
-        end,
-        0,
-        List
-    ),
-    {Elem, Cnt}.
-
-
 get_authors() ->
-    MS = ets:fun2ms(fun({idea, '_', '_', Author, '_', '_'}) -> Author end),
-    Authors = ets:select(great_ideas_table, MS),
-    NumAuthorsIdeas = lists:map(fun(A) -> elem_cnt(A, Authors) end, lists:usort(Authors)),
+    MS = ets:fun2ms(fun(?AuthorPtn) -> Author end),
+    % List of authors without repeats
+    Authors = lists:usort(ets:select(great_ideas_table, MS)),
+    % List containing tuples like {Author, NumOfIdeas}
+    AuthorsWithNumOfIdeas = lists:map(
+        fun(Author) -> {Author, length(ets:match(great_ideas_table, ?AuthorPtn))} end,
+        Authors
+    ),
     SortFn = 
-        fun({A1, C1},{A2, C2}) ->
-            if C1 == C2 -> A2 > A1;
-            true -> C1 > C2
+        fun({Author1, Count1},{Author2, Count2}) -> 
+            if Count1 == Count2 -> Author2 > Author1;
+            true -> Count1 > Count2
             end
         end,
-    lists:sort(SortFn, NumAuthorsIdeas).
+    % Sorts the previous list by number of ideas and authors names
+    lists:sort(SortFn, AuthorsWithNumOfIdeas).
 
