@@ -1,6 +1,7 @@
 -module(lesson06).
 
--export([init/0, count_record/1, dest_table_init/0, move/2]).
+-export([init/0, count_record/1, dest_table_init/0, move/2,
+            unique/1, recs/0]).
 
 -include_lib("stdlib/include/ms_transform.hrl").
 
@@ -68,4 +69,15 @@ move(Min, Max) ->
     end),
   ets:delete_all_objects(dest_table),
   ets:insert(dest_table, ets:select(sig_table, MS)).
+
+%%% -------------------------------------------------------------
+
+unique(List) ->
+    UniqElemFn = fun(Elem, UniqElemList) ->
+        case lists:member(Elem, UniqElemList) of
+            true -> UniqElemList;
+            false -> UniqElemList ++ [Elem]
+        end
+    end,
+    lists:foldl(UniqElemFn, [], List).
 
