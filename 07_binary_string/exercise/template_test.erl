@@ -61,3 +61,11 @@ unicode_data_in_test() ->
     Data = #{<<"имя"/utf8>> => <<"Петя"/utf8>>},
     ?assertEqual(Out, template:parse(In, Data)),
     ok.
+
+
+side_by_side_params_test() ->
+    In = <<"{{month}} {{day}} {{name}} celebrates his birthday">>,
+    Data = #{<<"month">> => "May", <<"day">> => 15, <<"name">> => <<"Bill">>},
+    Out = <<"May 15 Bill celebrates his birthday">>,
+    ?assertEqual(Out, template:parse(In, Data)),
+    ok.
