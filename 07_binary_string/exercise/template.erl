@@ -27,17 +27,20 @@ to_binary(Value) ->
 
 
 parse(BinStr, Data) ->
-    % Get start match indexes
+    %% Parses a BinStr template values like {{template_word}} with the map Data values
+    % Get start and end match indexes
     Starts = binary:matches(BinStr, ?StartTmpl),
-    % Get end match indexes
     Ends = binary:matches(BinStr, ?EndTmpl),
-    % Get {start, length} tuples list to extract template words (for binary_part function)
+
+    % Get list of {start, length} tuples to extract template words (for binary_part function)
     TmplIdxs = lists:map(fun(T)-> {A,B}=T, {A1,_}=A, {B1,B2}=B, {A1,B1+B2-A1} end, lists:zip(Starts, Ends)),
-    % Get template words with {{ }} from BinStr. They will be replaced with its Data values.
+
+    % Get template words along with double parentheses ({{ }}) from BinStr. They will be replaced with its Data values.
     TmplWords = lists:map(
         fun(Idxs) -> binary_part(BinStr, Idxs) end,
         TmplIdxs
     ),
+
     % Replace the BinStr template words with its Data values
     lists:foldl(
         fun(Word, Str) -> 
