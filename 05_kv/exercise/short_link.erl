@@ -8,15 +8,40 @@ init() ->
     %% init randomizer
     <<A:32, B:32, C:32>> = crypto:strong_rand_bytes(12),
     rand:seed(exsp, {A,B,C}),
-    State = your_state_structure,
+    State = #{},
     State.
 
 
 create_short(LongLink, State) ->
-    your_result.
+    %% Creates new short link for LongLink or gets existing one if it already in the State
+    %% Returns a tuple {NewShortLink, NewState} if a new short link have been created, {ExistingShortLink, ExistingState} otherwise
+    BaseLink = "http://hexlet.io/",
+
+    % Try to get LongLink from the State
+    LinkMap = maps:filter(
+        fun(_, V) -> LongLink == V end,
+        State
+    ),
+
+    % If not - create new short link, put it into the State, otherwise get existing short link 
+    if LinkMap == #{} ->
+        ShortLink = BaseLink ++ rand_str(5),
+        NewState = maps:put(ShortLink, LongLink, State),
+        {ShortLink, NewState};
+    true ->
+        [Link] = maps:keys(LinkMap),
+        {Link, State}
+    end.
+
 
 get_long(ShortLink, State) ->
-    {error, not_found}.
+    %% Gets LongLink by ShortLink
+    %% Returns {ok, LongLink} if ShortLink is in the State, {error, not_found} otherwise
+    LinkInState = maps:is_key(ShortLink, State),
+    if
+        LinkInState -> {ok, maps:get(ShortLink, State)};
+        true -> {error, not_found}
+    end.
 
 
 %% generates random string of chars [a-zA-Z0-9]
