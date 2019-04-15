@@ -9,23 +9,20 @@
 -define(ROOM, #{name => RoomName, users => [], messages => []}).
 
 
+%%%  API
 start() ->
     InitialState = #{
         % 1=>#{name=>"Rest",users=>["Helen","Bob"],messages=>[{"Helen","I like this room"},{"Helen","Will you come to us tonight?"},{"Bob","Hello rest room"},{"Bob","No. I'm busy tonight"}]},2=>#{name=>"Game",users=>["Kate","Bill"],messages=>[{"Bill","We don't talk anymore"},{"Bill","We will rock you!"},{"Kate","I love this Game room!"},{"Kate","I love my kitty too!"}]}
     },
     spawn(?MODULE, loop, [InitialState]).
 
+state(Server) ->
+    call(Server, state).
 
-%%%  API
-call(Server, Msg) ->
-    Ref = make_ref(),
-    Server ! {self(), Ref, Msg},
-    receive
-        {reply, Ref, Reply} -> Reply
-    after 3000 ->
-        noreply
-    end.
+stop(Server) ->
+    Server ! stop.
 
+%%  Rooms
 create_room(Server, RoomName) ->
     case valid_name(RoomName) of
         ok ->
@@ -40,9 +37,8 @@ remove_room(Server, RoomId) ->
 get_rooms(Server) ->
     call(Server, get_rooms).
 
-state(Server) ->
-    call(Server, state).
 
+%%  Users
 add_user(Server, RoomId, UserName) ->
     case valid_name(UserName) of
         ok ->
@@ -57,14 +53,13 @@ remove_user(Server, RoomId, UserName) ->
 get_users_list(Server, RoomId) ->
     call(Server, {get_users_list, RoomId}).
 
+
+%% Messages
 send_message(Server, RoomId, UserName, Message) ->
     call(Server, {send_message, RoomId, UserName, Message}).
 
 get_messages_history(Server, RoomId) ->
     call(Server, {get_messages_history, RoomId}).
-
-stop(Pid) ->
-    Pid ! stop.
 
 
 %%%  Utils
@@ -77,6 +72,17 @@ valid_name(Name) ->
 
 new_room_id(Server) ->
     call(Server, get_last_room_id) + 1.
+
+
+%%% Generic
+call(Server, Msg) ->
+    Ref = make_ref(),
+    Server ! {self(), Ref, Msg},
+    receive
+        {reply, Ref, Reply} -> Reply
+    after 3000 ->
+        noreply
+    end.
 
 
 %%%  LOOP
@@ -97,8 +103,8 @@ loop(State) ->
     end.
 
 
-%%%  CALLS HANDLERS
-%%   ROOMS
+%%%  Calls handlers
+%%   Rooms
 handle_call(State, {create_room, RoomId, Room}) ->
     case maps:size(State) of
         ?ROOMS_LIMIT ->
@@ -125,7 +131,7 @@ handle_call(State, get_rooms) ->
     {maps:to_list(Rooms), State};
 
 
-%%  USERS
+%%  Users
 handle_call(State, {add_user, RoomId, UserName}) ->
     case maps:find(RoomId, State) of
         {ok, Room} ->
@@ -165,7 +171,7 @@ handle_call(State, {get_users_list, RoomId}) ->
     end;
 
 
-%%  MESSAGES
+%%  Messages
 handle_call(State, {send_message, RoomId, UserName, Message}) ->
     case maps:find(RoomId, State) of
         {ok, Room} ->
@@ -191,7 +197,7 @@ handle_call(State, {get_messages_history, RoomId}) ->
     end;
 
 
-%%  EXTRA
+%%  Extra
 handle_call(State, get_last_room_id) ->
     Keys = lists:sort(maps:keys(State)),
     LastId = case Keys of
