@@ -43,6 +43,9 @@ room_test() ->
                   {Room5, <<"Room 5">>}]),
                  lists:sort(chat_room_manager:get_rooms(Server))),
 
+    ?assertEqual({error, not_valid_room_name}, chat_room_manager:create_room(Server, <<"@room">>)),
+    ?assertEqual({error, not_valid_room_name}, chat_room_manager:create_room(Server, <<"   ">>)),
+
     {error, room_not_found} = chat_room_manager:remove_room(Server, make_ref()),
 
     ok = chat_room_manager:remove_room(Server, Room2),
@@ -92,6 +95,9 @@ user_test() ->
 
     ok = chat_room_manager:add_user(Server, Room1, <<"Helen">>),
     ok = chat_room_manager:add_user(Server, Room2, <<"Kate">>),
+
+    ?assertEqual({error, not_valid_username}, chat_room_manager:add_user(Server, Room1, <<"*&^%">>)),
+    ?assertEqual({error, not_valid_username}, chat_room_manager:add_user(Server, Room2, <<"  ">>)),
 
     {ok, Room1Users} = chat_room_manager:get_users_list(Server, Room1),
     ?assertEqual({ok, lists:sort([<<"Helen">>, <<"Bob">>])}, {ok, lists:sort(Room1Users)}),
