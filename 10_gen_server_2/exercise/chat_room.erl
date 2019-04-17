@@ -3,7 +3,7 @@
 
 -export([start_link/0, add_user/3, remove_user/2, get_users/1, add_message/3, get_history/1, state/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
--export([get_users_default/1, swap_list_tuples/1]).
+-export([get_users_default/1, user_not_found_reply/0, swap_list_tuples/1]).
 
 
 %%% API
@@ -46,6 +46,9 @@ get_messages(Room) ->
 user_in_room(UserPid, Users) ->
     proplists:is_defined(UserPid, Users).
 
+user_not_found_reply() ->
+    {error, user_not_found}.
+
 swap_list_tuples(List) ->
     %% Swap places items in proplist tuples
     case is_proplist(List) of
@@ -87,7 +90,7 @@ handle_call({remove_user, UserPid}, _From, State) ->
             NewState = State#{users => proplists:delete(UserPid, Users)},
             {reply, ok, NewState};
         false ->
-            {reply, {error, user_not_found}, State}
+            {reply, user_not_found_reply(), State}
     end;
 
 handle_call(get_users, _From, State) ->

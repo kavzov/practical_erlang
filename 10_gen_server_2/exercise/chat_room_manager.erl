@@ -49,11 +49,14 @@ user_in_room(UserPid, RoomPid) ->
     {ok, UsersPidName} = chat_room:swap_list_tuples(Users),
     proplists:is_defined(UserPid, UsersPidName).
 
+room_not_found_reply() ->
+    {error, room_not_found}.
 
 %%% Handlers
 handle_call({create_room, RoomName, RoomPid}, _From, State) ->
     NewState = [{RoomPid, RoomName} | State],
-    {reply, {RoomName, RoomPid}, NewState};
+    Reply = {RoomName, RoomPid},
+    {reply, Reply, NewState};
 
 handle_call(get_rooms, _From, State) ->
     {ok, Reply} = chat_room:swap_list_tuples(State),
@@ -62,10 +65,10 @@ handle_call(get_rooms, _From, State) ->
 handle_call({add_user, RoomPid, UserName, UserPid}, _From, State) ->
     case is_room(RoomPid, State) of
         true ->
-            chat_room:add_user(RoomPid, UserName, UserPid),
-            {reply, ok, State};
+            Reply = chat_room:add_user(RoomPid, UserName, UserPid),
+            {reply, Reply, State};
         false ->
-            {reply, {error, room_not_found}, State}
+            {reply, room_not_found_reply(), State}
     end;
 
 handle_call({remove_user, RoomPid, UserPid}, _From, State) ->
@@ -73,13 +76,14 @@ handle_call({remove_user, RoomPid, UserPid}, _From, State) ->
         true ->
             case user_in_room(UserPid, RoomPid) of
                 true ->
-                    chat_room:remove_user(RoomPid, UserPid),
-                    {reply, ok, State};
+                    Reply = chat_room:remove_user(RoomPid, UserPid),
+                    {reply, Reply, State};
                 false ->
-                    {reply, {error, user_not_found}, State}
+                    Reply = chat_room:user_not_found_reply(),
+                    {reply, Reply, State}
             end;
         false ->
-            {reply, {error, room_not_found}, State}
+            {reply, room_not_found_reply(), State}
     end;
 
 handle_call({get_users, RoomPid}, _From, State) ->
@@ -88,7 +92,7 @@ handle_call({get_users, RoomPid}, _From, State) ->
             Users = chat_room:get_users(RoomPid),
             {reply, {ok, Users}, State};
         false ->
-            {reply, {error, room_not_found}, State}
+            {reply, room_not_found_reply(), State}
     end;
 
 handle_call({send_message, RoomPid, UserName, Msg}, _From, State) ->
@@ -97,7 +101,7 @@ handle_call({send_message, RoomPid, UserName, Msg}, _From, State) ->
             chat_room:add_message(RoomPid, UserName, Msg),
             {reply, ok, State};
         false ->
-            {reply, {error, room_not_found}, State}
+            {reply, room_not_found_reply(), State}
     end;
 
 handle_call({get_history, RoomPid}, _From, State) ->
@@ -106,7 +110,7 @@ handle_call({get_history, RoomPid}, _From, State) ->
             Messages = chat_room:get_history(RoomPid),
             {reply, {ok, Messages}, State};
         false ->
-            {reply, {error, room_not_found}, State}
+            {reply, room_not_found_reply(), State}
     end;
 
 handle_call(_Any, _From, State) ->
