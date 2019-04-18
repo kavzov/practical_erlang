@@ -7,21 +7,21 @@ parse_file() ->
     receive
         {From, Ref, File} ->
             {ok, Data} = file:read_file(File),
-            Records = binary:split(Data, [<<"\n">>, <<"\r">>], [global]),
-            Records2 = lists:filter(fun(Item) -> Item =/= <<>> end, Records),
-            Parsed_data = lists:foldl(
-                fun(Rec, Acc) ->
-                    [_, Name, Count, _] = binary:split(Rec, [<<",">>], [global]),
-                    IntCount = list_to_integer(binary_to_list(Count)),
+            Items = binary:split(Data, [<<"\n">>, <<"\r">>], [global]),
+            Items2 = lists:filter(fun(Item) -> Item =/= <<>> end, Items),
+            Parsed = lists:foldl(
+                fun(Item, Acc) ->
+                    [_, Name, CountBin, _] = binary:split(Item, [<<",">>], [global]),
+                    Count = list_to_integer(binary_to_list(CountBin)),
                     case maps:find(Name, Acc) of
-                        {ok, CurrCount} -> Acc#{Name := CurrCount + IntCount};
-                        error -> Acc#{Name => IntCount}
+                        {ok, CurCount} -> Acc#{Name := CurCount + Count};
+                        error -> Acc#{Name => Count}
                     end
                 end,
                 #{},
-                Records2
+                Items2
             ),
-            From ! {reply, Ref, Parsed_data}
-    after 3000 ->
-        no_file_to_parse
+            From ! {reply, Ref, Parsed}
+    after 5000 ->
+        {error, no_incoming_data}
     end.
