@@ -8,12 +8,13 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 
+init([]) ->
+    {ok, []}.
+
+
 %%% API
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
-
-init([]) ->
-    {ok, []}.
 
 create_room(Name) ->
     {ok, RoomPid} = chat_room:start_link(),
@@ -51,6 +52,7 @@ user_in_room(UserPid, RoomPid) ->
 
 room_not_found_reply() ->
     {error, room_not_found}.
+
 
 %%% Handlers
 handle_call({create_room, RoomName, RoomPid}, _From, State) ->
@@ -106,6 +108,7 @@ handle_call({get_history, RoomPid}, _From, State) ->
         false ->
             {reply, room_not_found_reply(), State}
     end;
+
 
 handle_call(_Any, _From, State) ->
     {noreply, State}.
