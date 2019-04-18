@@ -3,7 +3,7 @@
 
 -export([start_link/0, add_user/3, remove_user/2, get_users/1, add_message/3, get_history/1, state/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
--export([get_users_default/1, user_not_found_reply/0, swap_list_tuples/1]).
+-export([get_users_default/1, swap_list_tuples/1]).
 
 
 %%% API
@@ -62,7 +62,7 @@ swap_list_tuples(List) ->
             {error, not_proplist}
     end.
 
-is_proplist(List) ->
+is_proplist(List) when is_list(List)->
     lists:all(
         fun({_, _}) -> true;
            (Item) when is_atom(Item) -> true;

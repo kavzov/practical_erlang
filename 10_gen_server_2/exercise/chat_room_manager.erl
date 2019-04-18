@@ -74,14 +74,8 @@ handle_call({add_user, RoomPid, UserName, UserPid}, _From, State) ->
 handle_call({remove_user, RoomPid, UserPid}, _From, State) ->
     case is_room(RoomPid, State) of
         true ->
-            case user_in_room(UserPid, RoomPid) of
-                true ->
-                    Reply = chat_room:remove_user(RoomPid, UserPid),
-                    {reply, Reply, State};
-                false ->
-                    Reply = chat_room:user_not_found_reply(),
-                    {reply, Reply, State}
-            end;
+            Reply = chat_room:remove_user(RoomPid, UserPid),
+            {reply, Reply, State};
         false ->
             {reply, room_not_found_reply(), State}
     end;
