@@ -46,7 +46,7 @@ get_query(PathStr) ->
 
 -spec get_date(binary()) -> {integer(), integer(), integer()} | undefined.
 get_date(PathStr) ->
-    RE = <<"^(\\d+)\/(0[1-9]|1[0-2])\/(0[1-9]|[1,2][0-9]|3[0,1])">>,
+    RE = <<"^(\\d+)/(0[1-9]|1[0-2])/(0[1-9]|[1,2][0-9]|3[0,1])">>,
     case re:run(PathStr, RE, [{capture, all_but_first, binary}]) of
         {match, [Year, Month, Day]} ->
             {binary_to_integer(Year), binary_to_integer(Month), binary_to_integer(Day)};
