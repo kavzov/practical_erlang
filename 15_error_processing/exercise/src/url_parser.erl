@@ -14,7 +14,7 @@ get_protocol(URL) ->
 
 -spec get_domain(binary()) -> binary().
 get_domain(URL) ->
-    RE = <<"^http[s]?://(?<DOMAIN>((?!-)[\\w-]{1,63}(?<!-)\\.)+[a-zA-Z\\.?]{2,63})/.*">>,
+    RE = <<"^http[s]?://(?<DOMAIN>((?!-)[\\w-]{1,63}(?<!-)\\.)+[a-zA-Z\\.?]{2,63})/?(.*)?">>,
     case re:run(URL, RE, ?REOPTS) of
         {match, [Domain]} -> Domain;
         nomatch -> throw(invalidDomain)
