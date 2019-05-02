@@ -1,0 +1,22 @@
+{application, my_crypt,
+ [{description, "Crypto OTP task application"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {my_crypt_app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+
+  {env,[
+    {crypt_key, <<"Qwer1234zxcV">>},
+    {seed, {124 ,35 ,333}},
+    {hash_size, 16}
+  ]},
+
+  {env,[]},
+  {modules, []},
+
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.
