@@ -1,9 +1,9 @@
 my_crypt
 =====
 
-An OTP application
+The crypto OTP task application
 
-Build
+Run tests
 -----
 
-    $ rebar3 compile
+    $ rebar3 eunit
